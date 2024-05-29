@@ -1,3 +1,34 @@
+<?php 
+
+    require ('./data/conexao.php');
+    require ('./model/Produto.php');
+
+    $horario = date('H:i');
+    $hora = date('H');
+    $mensagem = "Bom dia";
+    if ($hora >= 12) $mensagem = "Boa tarde";
+    if ($hora >= 18) $mensagem = "Boa noite";
+
+    $sql = "SELECT * FROM produtos";
+    $resultado = $pdo->query($sql);
+    $dados = $resultado->fetchAll(PDO::FETCH_ASSOC);
+
+    $produtos = array_map(function ($produto) {
+        return new Produto(
+            $produto["id"],
+            $produto["nome"],
+            $produto["descricao"],
+            $produto["imagem"],
+            $produto["preco"]
+        );
+    }, $dados);
+
+    // var_dump($produtos);
+    // exit();
+    
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -13,11 +44,19 @@
     <nav>
         <h1>Epic Food</h1>
         <ul>
-            <li class="active"><a href="/index.html">cardápio</a></li>
-            <li><a href="/admin.html">produtos</a></li>
-            <li><a href="/new.html">cadastrar</a></li>
+            <li class="active"><a href="/index.php">cardápio</a></li>
+            <li><a href="/admin.php">produtos</a></li>
+            <li><a href="/new.php">cadastrar</a></li>
         </ul>
         <div>
+            <span>
+                <?= $mensagem ?>
+            </span>
+
+            <span>
+                <?= $horario ?>
+            </span>
+
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5" stroke="currentColor"
                 class="icon">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -40,30 +79,16 @@
 
         <h4 id="lanches">🍔 lanches</h4>
         <section>
-            <div class="card">
-                <img src="./assets/images/lanche1.jpg" alt="food">
-                <div class="card-body">
-                    <h5>hamburguer</h5>
-                    <p>hamburguer de carne bovina, queijo, alface, tomate e molho especial</p>
-                    <p class="price">R$ 15,00</p>
+            <?php foreach($produtos as $produto): ?>
+                <div class="card">
+                    <img src="<?= $produto->imagem ?>" alt="food">
+                    <div class="card-body">
+                        <h5><?= $produto->nome ?></h5>
+                        <p><?= $produto->descricao ?></p>
+                        <p class="price"><?= $produto->getPrecoFormatado() ?></p>
+                    </div>
                 </div>
-            </div>
-            <div class="card">
-                <img src="./assets/images/lanche1.jpg" alt="food">
-                <div class="card-body">
-                    <h5>hamburguer</h5>
-                    <p>hamburguer de carne bovina, queijo, alface, tomate e molho especial</p>
-                    <p class="price">R$ 15,00</p>
-                </div>
-            </div>
-            <div class="card">
-                <img src="./assets/images/lanche1.jpg" alt="food">
-                <div class="card-body">
-                    <h5>hamburguer</h5>
-                    <p>hamburguer de carne bovina, queijo, alface, tomate e molho especial</p>
-                    <p class="price">R$ 15,00</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </section>
 
         <h4 id="massas">🍝 massas</h4>
